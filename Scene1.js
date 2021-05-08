@@ -239,6 +239,7 @@ class Scene1 extends Phaser.Scene {
             yAxis = pad ? pad.axes[1].getValue() : 0;
         }
         
+        
         // Game over
         
         if (gameOver)
