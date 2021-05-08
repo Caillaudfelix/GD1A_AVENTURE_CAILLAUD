@@ -10,6 +10,7 @@ class Scene1 extends Phaser.Scene {
     preload(){
         this.load.image('tilesets', 'assets/tilesets.png');
         this.load.tilemapTiledJSON('start', 'start.json');
+        this.load.tilemapTiledJSON('end', 'end.json');
         this.load.spritesheet('player', "assets/player.png", { frameWidth: 21, frameHeight: 29 });
         this.load.image('knife', "assets/knife.png");
         this.load.image('coin', "assets/coin.png");
@@ -20,6 +21,8 @@ class Scene1 extends Phaser.Scene {
         this.load.image('enemy2', "assets/enemy2.png");
         this.load.image('enemy3', "assets/enemy3.png");
         this.load.image('enemy4', "assets/enemy4.png");
+        this.load.image('key', "assets/key.png");
+        this.load.image('victory', "assets/victory.png");
     }
     
     
@@ -46,7 +49,7 @@ class Scene1 extends Phaser.Scene {
         
         // Personnage
         
-        this.player = this.physics.add.sprite(230, 170, 'player');
+        this.player = this.physics.add.sprite(230, 180, 'player');
         
         
         // Ennemis
@@ -209,13 +212,32 @@ class Scene1 extends Phaser.Scene {
         this.camera = this.cameras.main.setSize(1280,720);
         this.camera.startFollow(this.player, true, 0.08, 0.08);
         this.camera.setBounds(0, 0, 3200, 1600);
-    }
+        
+        
+        // Sortie de zone
+        
+        this.environment.setTileLocationCallback(0, 38, 1, 5, ()=>{
+            if(this.antiGlitch){
+                this.antiGlitch = false;
+                this.scene.start('scene2')}})
+        this.antiGlitch = true;
+        }
     
     
     // Update
     
     update(){
         
+        
+        // Inputs manette
+    
+        let pad = Phaser.Input.Gamepad.Gamepad;
+
+        if(this.input.gamepad.total){
+            pad = this.input.gamepad.getPad(0)
+            xAxis = pad ? pad.axes[0].getValue() : 0;
+            yAxis = pad ? pad.axes[1].getValue() : 0;
+        }
         
         // Game over
         
@@ -227,28 +249,28 @@ class Scene1 extends Phaser.Scene {
         
         // Animation déplacements
         
-        if (this.cursors.left.isDown)
+        if (this.cursors.left.isDown || pad.left == 1 || xAxis < 0)
         {
             this.player.setVelocityX(-160);
 
             this.player.anims.play('left', true);
             direction = "left";
         }
-        else if (this.cursors.right.isDown)
+        else if (this.cursors.right.isDown || pad.right == 1 || xAxis > 0)
         {
             this.player.setVelocityX(160);
 
             this.player.anims.play('right', true);
             direction = "right";
         }
-        else if (this.cursors.up.isDown)
+        else if (this.cursors.up.isDown || pad.up == 1 || xAxis > 0)
         {
             this.player.setVelocityY(-160);
 
             this.player.anims.play('up', true);
             direction = "up";
         }
-        else if (this.cursors.down.isDown)
+        else if (this.cursors.down.isDown || pad.down == 1 || xAxis > 0)
         {
             this.player.setVelocityY(160);
 
